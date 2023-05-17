@@ -8,11 +8,11 @@ float train[][2] = {{0, 0}, {1, 2}, {2, 4}, {3, 6}, {4, 8}};
 float rand_float() { return (float)rand() / (float)RAND_MAX; }
 
 // cost function. Square of errors.
-float cost(float w) {
+float cost(float w, float b) {
     float result = 0.0f;
     for (size_t i = 0; i < train_count; ++i) {
         float x = train[i][0];
-        float y = x * w;
+        float y = x * w + b;
         float d = y - train[i][1];
         result += d * d;
     }
@@ -25,15 +25,19 @@ int main() {
     // srand(69);
     const float eps = 1e-3;
     const float rate = 1e-3;
+    float b = 5.0f;
 
     float w = rand_float() * 10;
 
     for (size_t i = 0; i < 80000; i++) {
-        float dcost =
-            (cost(w + eps) - cost(w)) / eps;  // derivative limit formula
-        printf("%f\n", cost(w));
-        w -= rate * dcost;
+        float c = cost(w, b);
+        float dw = (cost(w + eps, b) - c) / eps;  // derivative limit formula
+        float db = (cost(w, b + eps) - c) / eps;  // derivative limit formula
+        printf("%f\n", cost(w, b));
+
+        w -= rate * dw;
+        b -= rate * db;
     }
     puts("===================================");
-    printf("%f\n", w);
+    printf("Weight: %f, Bias: %f, Add: %f\n", w, b, w + b);
 }
