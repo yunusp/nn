@@ -13,11 +13,14 @@ int main() {
 
     float w = rand_float() * 10;
 
+    float result = 0.0f;
     for (size_t i = 0; i < train_count; ++i) {
         float x = train[i][0];
         float y = x * w;
-        printf("Actual: %f, expected: %f\n", y, train[i][0]);
+        float d = y - train[i][1];
+        result += d * d;
+        printf("Actual: %f, expected: %f\n", y, train[i][1]);
     }
-
-    printf("%f\n", w);
+    result /= train_count;
+    printf("%f\n", result);
 }
