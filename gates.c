@@ -37,8 +37,9 @@ int main() {
     float w2 = rand_float();
     float b = rand_float();
 
-    for (size_t i = 0; i < 1000 * 1000; i++) {
+    for (size_t i = 0; i < 10000 ; i++) {
         float c = cost(w1, w2, b);
+        // printf("%f\n", c);
         float dw1 = (cost(w1 + eps, w2, b) - c) / eps;
         float dw2 = (cost(w1, w2 + eps, b) - c) / eps;
         float db = (cost(w1, w2, b + eps) - c) / eps;
