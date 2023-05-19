@@ -14,14 +14,14 @@ float train[][3] = {
 
 float rand_float() { return (float)rand() / (float)RAND_MAX; }
 
-float sigf(float x) { return 1.f / (1.f + expf(-x)); }
+float sigmoidf(float x) { return 1.f / (1.f + expf(-x)); }
 
-float cost(float w1, float w2) {
+float cost(float w1, float w2, float b) {
     float result = 0.0f;
     for (size_t i = 0; i < train_count; ++i) {
         float x1 = train[i][0];
         float x2 = train[i][1];
-        float y = sigf(x1 * w1 + x2 * w2);
+        float y = sigmoidf(x1 * w1 + x2 * w2 + b);
         float d = y - train[i][2];
         result += d * d;
     }
@@ -35,13 +35,22 @@ int main() {
     const float rate = 1e-1;
     float w1 = rand_float();
     float w2 = rand_float();
+    float b = rand_float();
 
     for (size_t i = 0; i < 1000 * 1000; i++) {
-        float c = cost(w1, w2);
-        float dw1 = (cost(w1 + eps, w2) - c) / eps;
-        float dw2 = (cost(w1, w2 + eps) - c) / eps;
+        float c = cost(w1, w2, b);
+        float dw1 = (cost(w1 + eps, w2, b) - c) / eps;
+        float dw2 = (cost(w1, w2 + eps, b) - c) / eps;
+        float db = (cost(w1, w2, b + eps) - c) / eps;
         w1 -= rate * dw1;
         w2 -= rate * dw2;
+        b -= rate * db;
     }
-    printf("w1 = %f, w2 = %f, c = %f\n", w1, w2, cost(w1, w2));
+    printf("w1 = %f, w2 = %f, b = %f, c = %f\n", w1, w2, b, cost(w1, w2, b));
+
+    for (size_t i = 0; i < 2; i++) {
+        for (size_t j = 0; j < 2; j++) {
+            printf("%zu | %zu = %f\n", i, j, sigmoidf(i * w1 + j * w2 + b));
+        }
+    }
 }
