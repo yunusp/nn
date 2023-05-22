@@ -3,14 +3,34 @@
 #include <stdlib.h>
 #include <time.h>
 
+typedef float sample[3];
 // xor-gate
-float train[][3] = {
+sample or_train[] = {
     {0, 0, 0},
+    {0, 1, 1},
+    {1, 0, 1},
+    {1, 1, 1},
+};
+
+// and-gate
+sample and_train[] = {
+    {0, 0, 0},
+    {0, 1, 0},
+    {1, 0, 0},
+    {1, 1, 1},
+};
+
+// nand-gate
+sample nand_train[] = {
+    {0, 0, 1},
     {0, 1, 1},
     {1, 0, 1},
     {1, 1, 0},
 };
-#define train_count (sizeof(train) / sizeof(train[0]))
+
+
+sample* train = or_train;
+#define train_count 4
 
 float rand_float() { return (float)rand() / (float)RAND_MAX; }
 
