@@ -4,7 +4,7 @@
 #include <time.h>
 
 typedef float sample[3];
-// xor-gate
+// or-gate
 sample or_train[] = {
     {0, 0, 0},
     {0, 1, 1},
