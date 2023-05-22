@@ -3,12 +3,12 @@
 #include <stdlib.h>
 #include <time.h>
 
-// or-gate
+// xor-gate
 float train[][3] = {
     {0, 0, 0},
     {0, 1, 1},
     {1, 0, 1},
-    {1, 1, 1},
+    {1, 1, 0},
 };
 #define train_count (sizeof(train) / sizeof(train[0]))
 
