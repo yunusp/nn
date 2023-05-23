@@ -70,18 +70,91 @@ Xor rand_xor() {
 }
 
 void print_xor(Xor m) {
-    printf(",m.or_w1: %f\n", m.or_w1);
-    printf(",m.or_w2: %f\n", m.or_w2);
-    printf(",m.or_b: %f\n", m.or_b);
-    printf(",m.nand_w1: %f\n", m.nand_w1);
-    printf(",m.nand_w2: %f\n", m.nand_w2);
-    printf(",m.nand_b: %f\n", m.nand_b);
-    printf(",m.and_w1: %f\n", m.and_w1);
-    printf(",m.and_w2: %f\n", m.and_w2);
-    printf(",m.and_b: %f\n", m.and_b);
+    printf("m.or_w1: %f\n", m.or_w1);
+    printf("m.or_w2: %f\n", m.or_w2);
+    printf("m.or_b: %f\n", m.or_b);
+    printf("m.nand_w1: %f\n", m.nand_w1);
+    printf("m.nand_w2: %f\n", m.nand_w2);
+    printf("m.nand_b: %f\n", m.nand_b);
+    printf("m.and_w1: %f\n", m.and_w1);
+    printf("m.and_w2: %f\n", m.and_w2);
+    printf("m.and_b: %f\n", m.and_b);
+}
+
+const float eps = 1e-1;
+
+Xor finite_diff(Xor m) {
+    Xor g;
+    float c = cost(m);
+    float saved;
+
+    saved = m.or_w1;
+    m.or_w1 += eps;
+    g.or_w1 += (cost(m) - c) / eps;
+    m.or_w1 = saved;
+
+    saved = m.or_w2;
+    m.or_w2 += eps;
+    g.or_w2 = (cost(m) - c) / eps;
+    m.or_w2 = saved;
+
+    saved = m.or_b;
+    m.or_b += eps;
+    g.or_b = (cost(m) - c) / eps;
+    m.or_b = saved;
+
+    saved = m.nand_w1;
+    m.nand_w1 += eps;
+    g.nand_w1 = (cost(m) - c) / eps;
+    m.nand_w1 = saved;
+
+    saved = m.nand_w2;
+    m.nand_w2 += eps;
+    g.nand_w2 = (cost(m) - c) / eps;
+    m.nand_w2 = saved;
+
+    saved = m.nand_b;
+    m.nand_b += eps;
+    g.nand_b = (cost(m) - c) / eps;
+    m.nand_b = saved;
+
+    saved = m.and_w1;
+    m.and_w1 += eps;
+    g.and_w1 = (cost(m) - c) / eps;
+    m.and_w1 = saved;
+
+    saved = m.and_w2;
+    m.and_w2 += eps;
+    g.and_w2 = (cost(m) - c) / eps;
+    m.and_w2 = saved;
+
+    saved = m.and_b;
+    m.and_b += eps;
+    g.and_b = (cost(m) - c) / eps;
+    m.and_b = saved;
+
+    return g;
+}
+
+Xor learn(Xor m, Xor g, float rate) {
+    m.or_w1 -= g.or_w1 * rate;
+    m.or_w2 -= g.or_w2 * rate;
+    m.or_b -= g.or_b * rate;
+    m.nand_w1 -= g.nand_w1 * rate;
+    m.nand_w2 -= g.nand_w2 * rate;
+    m.nand_b -= g.nand_b * rate;
+    m.and_w1 -= g.and_w1 * rate;
+    m.and_w2 -= g.and_w2 * rate;
+    m.and_b -= g.and_b * rate;
+    return m;
 }
 
 int main() {
     Xor m = rand_xor();
-    print_xor(m);
+    for (size_t i = 0; i < 10*1000; i++) {
+        Xor g = finite_diff(m);
+        m = learn(m, g, 1e-1);
+        printf("Cost: %f\n", cost(m));
+    }
+    return 0;
 }
