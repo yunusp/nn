@@ -90,7 +90,7 @@ Xor finite_diff(Xor m) {
 
     saved = m.or_w1;
     m.or_w1 += eps;
-    g.or_w1 += (cost(m) - c) / eps;
+    g.or_w1 = (cost(m) - c) / eps;
     m.or_w1 = saved;
 
     saved = m.or_w2;
@@ -151,10 +151,17 @@ Xor learn(Xor m, Xor g, float rate) {
 
 int main() {
     Xor m = rand_xor();
-    for (size_t i = 0; i < 10*1000; i++) {
+    for (size_t i = 0; i < 500 * 1000; i++) {
         Xor g = finite_diff(m);
         m = learn(m, g, 1e-1);
-        printf("Cost: %f\n", cost(m));
+        // printf("Cost: %f\n", cost(m));
     }
+
+    for (size_t i = 0; i < 2; i++) {
+        for (size_t j = 0; j < 2; j++) {
+            printf("%zu ^ %zu = %f\n", i, j, forward(m, i, j));
+        }
+    }
+
     return 0;
 }
