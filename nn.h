@@ -21,7 +21,10 @@ typedef struct {
 
 #define MAT_AT(m, i, j) (m).es[(i) * (m).cols + (j)]
 
+float rand_float(void);
+
 Mat mat_alloc(size_t rows, size_t cols);
+void mat_rand(Mat m, float low, float high);
 void mat_dot(Mat dst, Mat a, Mat b);
 void mat_sum(Mat dst, Mat a);
 void mat_print(Mat a);
@@ -29,8 +32,11 @@ void mat_print(Mat a);
 #endif // NN_H_
 
 #define NN_IMPLEMENTATION
-// NOLINTBEGIN
+
+// NOLINTBEGIN(misc-definitions-in-headers)
 #ifdef NN_IMPLEMENTATION
+
+float rand_float(void) { return (float)rand() / (float)RAND_MAX; }
 
 Mat mat_alloc(size_t rows, size_t cols) {
   Mat m;
@@ -39,6 +45,14 @@ Mat mat_alloc(size_t rows, size_t cols) {
   m.es = (float *)NN_MALLOC(sizeof(*m.es) * rows * cols);
   assert(m.es != NULL);
   return m;
+}
+
+void mat_rand(Mat m, float low, float high) {
+  for (size_t i = 0; i < m.rows; ++i) {
+    for (size_t j = 0; j < m.cols; ++j) {
+      MAT_AT(m, i, j) = rand_float() * (high - low) + low;
+    }
+  }
 }
 
 void mat_dot(Mat dst, Mat a, Mat b) {
@@ -63,4 +77,4 @@ void mat_print(Mat m) {
 }
 
 #endif // NN_IMPLEMENTATION
-// NOLINTEND
+// NOLINTEND(misc-definitions-in-headers)
