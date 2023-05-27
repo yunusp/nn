@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #ifndef NN_H_
 #define NN_H_
@@ -17,6 +18,8 @@ typedef struct {
   size_t cols;
   float *es;
 } Mat;
+
+#define MAT_AT(m, i, j) (m).es[(i) * (m).cols + (j)]
 
 Mat mat_alloc(size_t rows, size_t cols);
 void mat_dot(Mat dst, Mat a, Mat b);
@@ -49,7 +52,15 @@ void mat_sum(Mat dst, Mat a) {
   (void)a;
 }
 
-void mat_print(Mat a) { (void)a; }
+void mat_print(Mat m) {
+  for (size_t i = 0; i < m.rows; ++i) {
+    for (size_t j = 0; j < m.cols; ++j) {
+      printf("%f ", MAT_AT(m, i, j));
+    }
+    printf("\n");
+  }
+  (void)m;
+}
 
 #endif // NN_IMPLEMENTATION
 // NOLINTEND
