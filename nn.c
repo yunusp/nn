@@ -1,9 +1,15 @@
+#include <stdlib.h>
+#include <time.h>
 #define NN_IMPLEMENTATION
 #include "nn.h"
 
 int main() {
-  Mat m = mat_alloc(2, 2);
-  mat_rand(m, 0.0f, 1.0f);
-  mat_print(m);
+  srand(time(0));
+  Mat a = mat_alloc(2, 2);
+  mat_fill(a, 1);
+  Mat b = mat_alloc(2, 2);
+  mat_fill(b, 3);
+  mat_sum(a, b);
+  mat_print(a);
   return 0;
 }

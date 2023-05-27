@@ -55,6 +55,14 @@ void mat_rand(Mat m, float low, float high) {
   }
 }
 
+void mat_fill(Mat m, float n) {
+  for (size_t i = 0; i < m.rows; ++i) {
+    for (size_t j = 0; j < m.cols; ++j) {
+      MAT_AT(m, i, j) = n;
+    }
+  }
+}
+
 void mat_dot(Mat dst, Mat a, Mat b) {
   (void)dst;
   (void)a;
@@ -62,8 +70,13 @@ void mat_dot(Mat dst, Mat a, Mat b) {
 }
 
 void mat_sum(Mat dst, Mat a) {
-  (void)dst;
-  (void)a;
+  NN_ASSERT(dst.rows == a.rows);
+  NN_ASSERT(dst.cols == a.cols);
+  for (size_t i = 0; i < dst.rows; ++i) {
+    for (size_t j = 0; j < dst.cols; ++j) {
+      MAT_AT(dst, i, j) += MAT_AT(a, i, j);
+    }
+  }
 }
 
 void mat_print(Mat m) {
@@ -73,7 +86,6 @@ void mat_print(Mat m) {
     }
     printf("\n");
   }
-  (void)m;
 }
 
 #endif // NN_IMPLEMENTATION
