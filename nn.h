@@ -25,6 +25,7 @@ float rand_float(void);
 
 Mat mat_alloc(size_t rows, size_t cols);
 void mat_rand(Mat m, float low, float high);
+void mat_fill(Mat m, float n);
 void mat_dot(Mat dst, Mat a, Mat b);
 void mat_sum(Mat dst, Mat a);
 void mat_print(Mat a);
@@ -64,6 +65,20 @@ void mat_fill(Mat m, float n) {
 }
 
 void mat_dot(Mat dst, Mat a, Mat b) {
+  NN_ASSERT(a.cols == b.rows);
+  size_t n = a.cols;
+  NN_ASSERT(dst.rows == a.rows);
+  NN_ASSERT(dst.cols == b.cols);
+
+  for (size_t i = 0; i < dst.rows; ++i) {
+    for (size_t j = 0; j < dst.cols; ++j) {
+      MAT_AT(dst, i, j) = 0;
+      for (size_t k = 0; k < n; ++k) {
+        MAT_AT(dst, i, j) += MAT_AT(a, i, k) * MAT_AT(b, k, j);
+      }
+    }
+  }
+
   (void)dst;
   (void)a;
   (void)b;
