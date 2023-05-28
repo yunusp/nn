@@ -46,6 +46,46 @@ float forward_xor(Xor m) {
   return *m.a2.es;
 }
 
+void finite_difference(Xor m, Xor g, float eps, Mat ti, Mat to) {
+  float saved;
+  float c = cost(m, ti, to);
+  for (size_t i = 0; i < m.w1.rows; ++i) {
+    for (size_t j = 0; j < m.w1.cols; ++j) {
+      saved = MAT_AT(m.w1, i, j);
+      MAT_AT(m.w1, i, j) += eps;
+      MAT_AT(g.w1, i, j) = (cost(m, ti, to) - c) / eps;
+      MAT_AT(m.w1, i, j) = saved;
+    }
+  }
+
+  for (size_t i = 0; i < m.b1.rows; ++i) {
+    for (size_t j = 0; j < m.b1.cols; ++j) {
+      saved = MAT_AT(m.b1, i, j);
+      MAT_AT(m.b1, i, j) += eps;
+      MAT_AT(g.b1, i, j) = (cost(m, ti, to) - c) / eps;
+      MAT_AT(m.b1, i, j) = saved;
+    }
+  }
+
+  for (size_t i = 0; i < m.w2.rows; ++i) {
+    for (size_t j = 0; j < m.w2.cols; ++j) {
+      saved = MAT_AT(m.w2, i, j);
+      MAT_AT(m.w2, i, j) += eps;
+      MAT_AT(g.w2, i, j) = (cost(m, ti, to) - c) / eps;
+      MAT_AT(m.w2, i, j) = saved;
+    }
+  }
+
+  for (size_t i = 0; i < m.b2.rows; ++i) {
+    for (size_t j = 0; j < m.b2.cols; ++j) {
+      saved = MAT_AT(m.b2, i, j);
+      MAT_AT(m.b2, i, j) += eps;
+      MAT_AT(g.b2, i, j) = (cost(m, ti, to) - c) / eps;
+      MAT_AT(m.b2, i, j) = saved;
+    }
+  }
+}
+
 float td[] = {
     0, 0, 0,
 
