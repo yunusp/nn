@@ -137,11 +137,6 @@ float td[] = {
 int main() {
   srand(time(0));
 
-  size_t arch[] = {2, 2, 1};
-  NN nn = nn_alloc(arch, ARRAY_LEN(arch));
-  NN_PRINT(nn);
-
-  return 0;
   size_t stride = 3;
   size_t n = sizeof(td) / sizeof(td[0]) / stride;
   Mat ti = {
@@ -157,6 +152,14 @@ int main() {
       .es = td + 2,
   };
 
+  size_t arch[] = {2, 2, 1};
+  NN nn = nn_alloc(arch, ARRAY_LEN(arch));
+  nn_rand(nn, 0.0f, 1.0f);
+  mat_copy(NN_INPUT(nn), mat_row(ti, 1));
+  nn_forward(nn);
+  MAT_PRINT(NN_OUTPUT(nn));
+
+  return 0;
   // MAT_PRINT(ti);
   // MAT_PRINT(to);
 

@@ -45,8 +45,13 @@ typedef struct {
   Mat *as; // This is always count + 1
 } NN;
 
+#define NN_INPUT(nn) (nn).as[0]
+#define NN_OUTPUT(nn) (nn).as[(nn).count]
+
 NN nn_alloc(size_t *arch, size_t arch_count);
 void nn_print(NN nn, const char *name);
+void nn_rand(NN nn, float low, float high);
+void nn_forward(NN nn);
 #define NN_PRINT(nn) nn_print(nn, #nn)
 #endif // NN_H_
 
@@ -183,6 +188,19 @@ void nn_print(NN nn, const char *name) {
     mat_print(bs[i], buf, 4);
   }
   printf("]\n");
+}
+void nn_rand(NN nn, float low, float high) {
+  for (size_t i = 0; i < nn.count; ++i) {
+    mat_rand(nn.ws[i], low, high);
+    mat_rand(nn.bs[i], low, high);
+  }
+}
+void nn_forward(NN nn) {
+  for (size_t i = 0; i < nn.count; i++) {
+    mat_dot(nn.as[i + 1], nn.as[i], nn.ws[i]);
+    mat_sum(nn.as[i + 1], nn.bs[i]);
+    mat_sig(nn.as[i + 1]);
+  }
 }
 #endif // NN_IMPLEMENTATION
 // NOLINTEND(misc-definitions-in-headers)
