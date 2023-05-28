@@ -1,3 +1,5 @@
+#include <assert.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <time.h>
 #define NN_IMPLEMENTATION
@@ -9,10 +11,30 @@ typedef struct {
   Mat w2, b2, a2;
 } Xor;
 
-float forward_xor(Xor m, float x1, float x2) {
-  MAT_AT(m.a0, 0, 0) = x1;
-  MAT_AT(m.a0, 0, 1) = x2;
+float forward_xor(Xor m);
 
+float cost(Xor m, Mat ti, Mat to) {
+  assert(ti.rows == to.rows);
+  assert(to.cols == m.a2.cols);
+  size_t n = ti.rows;
+
+  float c = 0;
+  for (size_t i = 0; i < n; i++) {
+    Mat x = mat_row(ti, i);
+    Mat y = mat_row(to, i);
+
+    mat_copy(m.a0, x);
+    forward_xor(m);
+    size_t q = to.cols;
+    for (size_t j = 0; j < q; j++) {
+      float d = MAT_AT(m.a2, 0, j) - MAT_AT(y, 0, j);
+      c += d * d;
+    }
+  }
+  return c / n;
+}
+
+float forward_xor(Xor m) {
   mat_dot(m.a1, m.a0, m.w1);
   mat_sum(m.a1, m.b1);
   mat_sig(m.a1);
@@ -24,8 +46,36 @@ float forward_xor(Xor m, float x1, float x2) {
   return *m.a2.es;
 }
 
+float td[] = {
+    0, 0, 0,
+
+    0, 1, 1,
+
+    1, 0, 1,
+
+    1, 1, 0,
+};
+
 int main() {
   srand(time(0));
+
+  size_t stride = 3;
+  size_t n = sizeof(td) / sizeof(td[0]) / stride;
+  Mat ti = {
+      .rows = n,
+      .cols = 2,
+      .stride = stride,
+      .es = td,
+  };
+  Mat to = {
+      .rows = n,
+      .cols = 1,
+      .stride = stride,
+      .es = td + 2,
+  };
+
+  MAT_PRINT(ti);
+  MAT_PRINT(to);
 
   Xor m;
   m.a0 = mat_alloc(1, 2);
@@ -41,20 +91,19 @@ int main() {
   mat_rand(m.b1, 0.0f, 1.0f);
   mat_rand(m.b2, 0.0f, 1.0f);
 
-  MAT_AT(m.a0, 0, 0) = 0;
-  MAT_AT(m.a0, 0, 1) = 1;
-  mat_dot(m.a1, a0, w1);
-  mat_sum(m.a1, b1);
-  mat_sig(m.a1);
+  printf("Cost: %f\n", cost(m, ti, to));
+#if 0
+  for (size_t i = 0; i < 2; ++i) {
+    for (size_t j = 0; j < 2; ++j) {
 
-  mat_dot(a2, a1, w2);
-  mat_sum(a2, b2);
-  mat_sig(a2);
+      MAT_AT(m.a0, 0, 0) = i;
+      MAT_AT(m.a0, 0, 1) = j;
+      forward_xor(m);
+      float y = *(m.a2.es);
 
-  MAT_PRINT(w1);
-  MAT_PRINT(w2);
-  MAT_PRINT(b1);
-  MAT_PRINT(b2);
-
+      printf("%zu ^ %zu = %f\n", i, j, y);
+    }
+  }
+#endif
   return 0;
 }
