@@ -26,7 +26,7 @@ typedef struct {
 } Mat;
 
 #define MAT_AT(m, i, j) (m).es[(i) * (m).stride + (j)]
-#define MAT_PRINT(m) mat_print(m, #m)
+#define MAT_PRINT(m) mat_print(m, #m, 0)
 
 Mat mat_alloc(size_t rows, size_t cols);
 void mat_rand(Mat m, float low, float high);
@@ -36,7 +36,7 @@ void mat_fill(Mat m, float n);
 void mat_dot(Mat dst, Mat a, Mat b);
 void mat_sum(Mat dst, Mat a);
 void mat_sig(Mat m);
-void mat_print(Mat a, const char *name);
+void mat_print(Mat a, const char *name, size_t padding);
 
 typedef struct {
   size_t count;
@@ -46,6 +46,8 @@ typedef struct {
 } NN;
 
 NN nn_alloc(size_t *arch, size_t arch_count);
+void nn_print(NN nn, const char *name);
+#define NN_PRINT(nn) nn_print(nn, #nn)
 #endif // NN_H_
 
 #define NN_IMPLEMENTATION
@@ -136,15 +138,17 @@ void mat_sig(Mat m) {
   }
 }
 
-void mat_print(Mat m, const char *name) {
-  printf("%s = [\n", name);
+void mat_print(Mat m, const char *name, size_t padding) {
+  printf("%*s", (int)padding, "");
+  printf("%*s%s = [\n", (int)padding, "", name);
   for (size_t i = 0; i < m.rows; ++i) {
+    printf("%*s", (int)padding, "");
     for (size_t j = 0; j < m.cols; ++j) {
-      printf("    %f ", MAT_AT(m, i, j));
+      printf("%f ", MAT_AT(m, i, j));
     }
     printf("\n");
   }
-  printf("]\n");
+  printf("%*s]\n", (int)padding, "");
 }
 
 NN nn_alloc(size_t *arch, size_t arch_count) {
@@ -166,6 +170,19 @@ NN nn_alloc(size_t *arch, size_t arch_count) {
   }
 
   return nn;
+}
+void nn_print(NN nn, const char *name) {
+  char buf[256];
+  printf("%s = [\n", name);
+  Mat *ws = nn.ws;
+  Mat *bs = nn.bs;
+  for (size_t i = 0; i < nn.count; ++i) {
+    snprintf(buf, sizeof(buf), "ws%zu", i);
+    mat_print(ws[i], buf, 4);
+    snprintf(buf, sizeof(buf), "bs%zu", i);
+    mat_print(bs[i], buf, 4);
+  }
+  printf("]\n");
 }
 #endif // NN_IMPLEMENTATION
 // NOLINTEND(misc-definitions-in-headers)
