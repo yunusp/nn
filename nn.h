@@ -28,6 +28,8 @@ float sigmoidf(float x);
 
 Mat mat_alloc(size_t rows, size_t cols);
 void mat_rand(Mat m, float low, float high);
+Mat mat_row(Mat m, size_t row);
+void mat_copy(Mat dst, Mat src);
 void mat_fill(Mat m, float n);
 void mat_dot(Mat dst, Mat a, Mat b);
 void mat_sum(Mat dst, Mat a);
@@ -49,7 +51,7 @@ Mat mat_alloc(size_t rows, size_t cols) {
   m.rows = rows;
   m.cols = cols;
   m.es = (float *)NN_MALLOC(sizeof(*m.es) * rows * cols);
-  assert(m.es != NULL);
+  NN_ASSERT(m.es != NULL);
   return m;
 }
 
@@ -91,6 +93,25 @@ void mat_sum(Mat dst, Mat a) {
   for (size_t i = 0; i < dst.rows; ++i) {
     for (size_t j = 0; j < dst.cols; ++j) {
       MAT_AT(dst, i, j) += MAT_AT(a, i, j);
+    }
+  }
+}
+
+Mat mat_row(Mat m, size_t row) {
+  return (Mat){
+      .rows = 1,
+      .cols = m.cols,
+      .es = &MAT_AT(m, row, 0),
+  };
+}
+
+void mat_copy(Mat dst, Mat src) {
+  NN_ASSERT(dst.rows == src.rows);
+  NN_ASSERT(dst.cols == src.cols);
+
+  for (size_t i = 0; i < dst.rows; ++i) {
+    for (size_t j = 0; j < dst.cols; ++j) {
+      MAT_AT(dst, i, j) = MAT_AT(src, i, j);
     }
   }
 }
